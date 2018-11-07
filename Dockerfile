@@ -1,0 +1,60 @@
+FROM lsiobase/alpine.nginx:3.8
+
+# set version label
+ARG BUILD_DATE
+ARG VERSION
+LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
+LABEL maintainer="alex-phillips"
+
+RUN \
+ echo "**** install build packages ****" && \
+ apk add --no-cache --virtual=build-dependencies \
+    git \
+    composer && \
+ echo "**** install runtime packages ****" && \
+ apk add --no-cache \
+    curl \
+	php7 \
+    php7-bcmath \
+    php7-curl \
+    php7-dom \
+    php7-gd \
+    php7-iconv \
+    php7-intl \
+    php7-json \
+    php7-mbstring \
+    php7-mcrypt \
+    php7-opcache \
+    php7-pdo_mysql \
+    php7-simplexml \
+    php7-tokenizer \
+    php7-xmlreader \
+    php7-zip && \
+ echo "**** install monicahq ****" && \
+ mkdir -p /app/monica && \
+ if [ -z ${MONICAHQ_RELEASE+x} ]; then \
+	MONICAHQ_RELEASE=$(curl -sX GET "https://api.github.com/repos/monicahq/monica/releases/latest" \
+	| awk '/tag_name/{print $4;exit}' FS='[""]'); \
+ fi && \
+ curl -o \
+ /tmp/monica.tar.gz -L \
+	"https://github.com/monicahq/monica/archive/${MONICAHQ_RELEASE}.tar.gz" && \
+ tar xf \
+ /tmp/monica.tar.gz -C \
+	/app/monica/ --strip-components=1 && \
+ echo "**** install composer packages ****" && \
+ cd /app/monica && \
+ composer install --no-dev && \
+ echo "**** cleanup ****" && \
+ apk del --purge \
+	build-dependencies && \
+ rm -rf \
+	/root/.cache \
+	/tmp/*
+
+# copy local files
+COPY root/ /
+
+# ports and volumes
+EXPOSE 8000
+VOLUME /config

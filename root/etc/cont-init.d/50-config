@@ -1,0 +1,65 @@
+#!/usr/bin/with-contenv bash
+
+# set default values for variables
+declare -A MONICA_CONF
+
+MONICA_CONF[HASH_SALT]=${HASH_SALT:-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)}
+MONICA_CONF[APP_URL]=${APP_URL:-}
+MONICA_CONF[DB_CONNECTION]=${DB_CONNECTION:-mysql}
+MONICA_CONF[DB_HOST]=${DB_HOST:-mariadb}
+MONICA_CONF[DB_PORT]=${DB_PORT:-3306}
+MONICA_CONF[DB_DATABASE]=${DB_DATABASE:-monica}
+MONICA_CONF[DB_USERNAME]=${DB_USERNAME:-root}
+MONICA_CONF[DB_PASSWORD]=${DB_PASSWORD:-}
+
+rm /app/monica/.env
+ln -s /config/.env /app/monica/.env
+
+# persist env variables
+if [ ! -f "/config/.env" ]; then
+    cp /defaults/env /config/.env
+	# sed in values or skip if value not set
+	for KEY in "${!MONICA_CONF[@]}"; do \
+	if [[ ${MONICA_CONF[$KEY]} == "" ]]; then \
+	:
+	else sed -i 's|{{'$KEY'}}|'${MONICA_CONF[$KEY]}'|g' /config/.env
+	fi
+	done
+
+    /usr/bin/php /app/monica/artisan key:generate
+fi
+
+if [ ! -f "/etc/profile.d/diskover.sh" ]; then
+	ln -s /config/.env /etc/profile.d/diskover.sh
+fi
+
+# create folders
+mkdir -p \
+	/config/{log/diskover,crontabs}
+
+# copy crontab and proxy defaults if needed
+[[ ! -f /config/crontabs/abc ]] && \
+	cp /etc/crontabs/abc /config/crontabs/
+
+# import user crontabs
+rm /etc/crontabs/*
+cp /config/crontabs/* /etc/crontabs/
+
+if [ ! -d /config/storage ]; then
+    mv /app/monica/storage /config/
+fi
+
+rm -rf /app/monica/storage
+ln -s /config/storage /app/monica/storage
+
+cd /app/monica
+/usr/bin/php artisan setup:production --force
+/usr/bin/php artisan passport:install
+/usr/bin/php artisan config:cache
+
+# permissions
+chmod -R 775 \
+    /config/storage
+chown -R abc:abc \
+	/app/monica \
+	/config

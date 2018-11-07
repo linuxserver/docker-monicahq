@@ -1,0 +1,1 @@
+* * * * *   /usr/bin/php /app/monica/artisan schedule:run
