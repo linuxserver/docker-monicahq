@@ -17,7 +17,7 @@ ln -s /config/.env /app/monica/.env
 
 # persist env variables
 if [ ! -f "/config/.env" ]; then
-    cp /defaults/env /config/.env
+	cp /defaults/env /config/.env
 	# sed in values or skip if value not set
 	for KEY in "${!MONICA_CONF[@]}"; do \
 	if [[ ${MONICA_CONF[$KEY]} == "" ]]; then \
@@ -26,7 +26,7 @@ if [ ! -f "/config/.env" ]; then
 	fi
 	done
 
-    /usr/bin/php /app/monica/artisan key:generate
+	/usr/bin/php /app/monica/artisan key:generate
 fi
 
 if [ ! -f "/etc/profile.d/diskover.sh" ]; then
