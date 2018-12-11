@@ -18,6 +18,7 @@ RUN \
     php7-bcmath \
     php7-curl \
     php7-dom \
+    php7-ctype \
     php7-gd \
     php7-iconv \
     php7-intl \
@@ -55,6 +56,4 @@ RUN \
 # copy local files
 COPY root/ /
 
-# ports and volumes
-EXPOSE 8000
-VOLUME /config
+EXPOSE 80
