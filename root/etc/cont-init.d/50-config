@@ -9,14 +9,16 @@ MONICA_CONF[DB_CONNECTION]=${DB_CONNECTION:-mysql}
 MONICA_CONF[DB_HOST]=${DB_HOST:-mariadb}
 MONICA_CONF[DB_PORT]=${DB_PORT:-3306}
 MONICA_CONF[DB_DATABASE]=${DB_DATABASE:-monica}
-MONICA_CONF[DB_USERNAME]=${DB_USERNAME:-root}
-MONICA_CONF[DB_PASSWORD]=${DB_PASSWORD:-}
+MONICA_CONF[DB_USER]=${DB_USER:-root}
+MONICA_CONF[DB_PASS]=${DB_PASS:-}
 
 rm /app/monica/.env
 ln -s /config/.env /app/monica/.env
 
 # persist env variables
+FIRST_RUN="false"
 if [ ! -f "/config/.env" ]; then
+	FIRST_RUN="true"
 	cp /defaults/env /config/.env
 	# sed in values or skip if value not set
 	for KEY in "${!MONICA_CONF[@]}"; do \
@@ -52,10 +54,12 @@ fi
 rm -rf /app/monica/storage
 ln -s /config/storage /app/monica/storage
 
-cd /app/monica
-/usr/bin/php artisan setup:production --force
-/usr/bin/php artisan passport:install
-/usr/bin/php artisan config:cache
+if [[ FIRST_RUN = "true" ]]; then
+	cd /app/monica
+	/usr/bin/php artisan setup:production --force
+	/usr/bin/php artisan passport:install
+	/usr/bin/php artisan config:cache
+fi
 
 # permissions
 chmod -R 775 \

@@ -32,8 +32,8 @@ DB_PORT={{DB_PORT}}
 # You can use mysql unix socket if available, it overrides DB_HOST and DB_PORT values.
 #DB_UNIX_SOCKET=/var/run/mysqld/mysqld.sock
 DB_DATABASE={{DB_DATABASE}}
-DB_USERNAME={{DB_USERNAME}}
-DB_PASSWORD={{DB_PASSWORD}}
+DB_USERNAME={{DB_USER}}
+DB_PASSWORD={{DB_PASS}}
 DB_PREFIX=
 DB_TEST_HOST=127.0.0.1
 DB_TEST_DATABASE=monica_test
