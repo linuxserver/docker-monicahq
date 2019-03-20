@@ -45,7 +45,10 @@ RUN \
 	/app/monica/ --strip-components=1 && \
  echo "**** install composer packages ****" && \
  cd /app/monica && \
- composer install --no-dev && \
+ composer install \
+   --no-dev \
+   --no-suggest \
+   --no-interaction && \
  echo "**** cleanup ****" && \
  apk del --purge \
 	build-dependencies && \
