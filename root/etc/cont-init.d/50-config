@@ -12,7 +12,7 @@ MONICA_CONF[DB_DATABASE]=${DB_DATABASE:-monica}
 MONICA_CONF[DB_USER]=${DB_USER:-root}
 MONICA_CONF[DB_PASS]=${DB_PASS:-}
 
-rm /app/monica/.env
+rm /app/monica/.env 2>/dev/null
 ln -s /config/.env /app/monica/.env
 
 # persist env variables
@@ -31,35 +31,33 @@ if [ ! -f "/config/.env" ]; then
 	/usr/bin/php /app/monica/artisan key:generate
 fi
 
-if [ ! -f "/etc/profile.d/diskover.sh" ]; then
-	ln -s /config/.env /etc/profile.d/diskover.sh
-fi
-
 # create folders
 mkdir -p \
-	/config/{log/diskover,crontabs}
+	/config/crontabs
 
 # copy crontab and proxy defaults if needed
-[[ ! -f /config/crontabs/abc ]] && \
+[[ ! -e /config/crontabs/abc ]] && \
 	cp /etc/crontabs/abc /config/crontabs/
 
 # import user crontabs
 rm /etc/crontabs/*
 cp /config/crontabs/* /etc/crontabs/
 
-if [ ! -d /config/storage ]; then
-    mv /app/monica/storage /config/
-fi
+[[ ! -e "/config/storage" ]] && \
+	mv /app/monica/storage /config/
 
 rm -rf /app/monica/storage
 ln -s /config/storage /app/monica/storage
 
+cd /app/monica
+
 if [[ FIRST_RUN = "true" ]]; then
-	cd /app/monica
 	/usr/bin/php artisan setup:production --force
 	/usr/bin/php artisan passport:install
 	/usr/bin/php artisan config:cache
 fi
+
+/usr/bin/php artisan migrate
 
 # permissions
 chmod -R 775 \
