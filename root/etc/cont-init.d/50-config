@@ -3,8 +3,6 @@
 # set default values for variables
 declare -A MONICA_CONF
 
-MONICA_CONF[HASH_SALT]=${HASH_SALT:-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)}
-MONICA_CONF[APP_URL]=${APP_URL:-}
 MONICA_CONF[DB_CONNECTION]=${DB_CONNECTION:-mysql}
 MONICA_CONF[DB_HOST]=${DB_HOST:-mariadb}
 MONICA_CONF[DB_PORT]=${DB_PORT:-3306}

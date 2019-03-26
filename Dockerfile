@@ -3,6 +3,7 @@ FROM lsiobase/alpine.nginx:3.8
 # set version label
 ARG BUILD_DATE
 ARG VERSION
+ARG MONICAHQ_RELEASE
 LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
 LABEL maintainer="alex-phillips"
 
@@ -58,5 +59,3 @@ RUN \
 
 # copy local files
 COPY root/ /
-
-EXPOSE 80
