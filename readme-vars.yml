@@ -3,7 +3,7 @@
 # project information
 project_name: monica
 project_url: "https://github.com/monicahq/monica"
-project_logo: ""
+project_logo: "https://www.monicahq.com/img/logo_vertical.png"
 project_blurb: |
   [{{ project_name|capitalize }}]({{ project_url }}) Monica helps you organize the social interactions with your loved ones.
 
