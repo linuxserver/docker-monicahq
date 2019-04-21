@@ -10,28 +10,29 @@ LABEL maintainer="alex-phillips"
 RUN \
  echo "**** install build packages ****" && \
  apk add --no-cache --virtual=build-dependencies \
-    git \
-    composer && \
+	git \
+	composer && \
  echo "**** install runtime packages ****" && \
  apk add --no-cache \
-    curl \
+	curl \
+	netcat-openbsd \
 	php7 \
-    php7-bcmath \
-    php7-curl \
-    php7-dom \
-    php7-ctype \
-    php7-gd \
-    php7-iconv \
-    php7-intl \
-    php7-json \
-    php7-mbstring \
-    php7-mcrypt \
-    php7-opcache \
-    php7-pdo_mysql \
-    php7-simplexml \
-    php7-tokenizer \
-    php7-xmlreader \
-    php7-zip && \
+	php7-bcmath \
+	php7-curl \
+	php7-dom \
+	php7-ctype \
+	php7-gd \
+	php7-iconv \
+	php7-intl \
+	php7-json \
+	php7-mbstring \
+	php7-mcrypt \
+	php7-opcache \
+	php7-pdo_mysql \
+	php7-simplexml \
+	php7-tokenizer \
+	php7-xmlreader \
+	php7-zip && \
  echo "**** install monicahq ****" && \
  mkdir -p /app/monica && \
  if [ -z ${MONICAHQ_RELEASE+x} ]; then \
@@ -47,9 +48,9 @@ RUN \
  echo "**** install composer packages ****" && \
  cd /app/monica && \
  composer install \
-   --no-dev \
-   --no-suggest \
-   --no-interaction && \
+	--no-dev \
+	--no-suggest \
+	--no-interaction && \
  echo "**** cleanup ****" && \
  apk del --purge \
 	build-dependencies && \

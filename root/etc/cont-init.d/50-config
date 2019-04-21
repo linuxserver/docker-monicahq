@@ -49,6 +49,24 @@ ln -s /config/storage /app/monica/storage
 
 cd /app/monica
 
+# check for the mysql endpoint for 30 seconds
+if [ -z ${DB_PORT+x} ]; then
+	DB_PORT=3306
+fi
+END=$((SECONDS+30))
+while [ ${SECONDS} -lt ${END} ]; do
+	/usr/bin/nc -z ${DB_HOST} ${DB_PORT} && \
+	if [ ! -z "$(/usr/bin/nc -w1 ${DB_HOST} ${DB_PORT})" ]; then
+		[ ! -z "${RUN}" ] && break
+		RUN="RAN"
+		# we sleep here again due to first run init on DB containers
+		[[ FIRST_RUN = "true" ]] && sleep 5
+	else
+		sleep 1
+	fi
+	sleep 1
+done
+
 if [[ FIRST_RUN = "true" ]]; then
 	/usr/bin/php artisan setup:production --force
 	/usr/bin/php artisan passport:install
@@ -59,7 +77,7 @@ fi
 
 # permissions
 chmod -R 775 \
-    /config/storage
+	/config/storage
 chown -R abc:abc \
 	/app/monica \
 	/config
